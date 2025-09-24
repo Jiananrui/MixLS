@@ -1,0 +1,337 @@
+---
+title: "Introduction to MixLS: Mixed-Effects Location Scale Models"
+author: "Jianan Rui"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to MixLS: Mixed-Effects Location Scale Models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 10,      
+  fig.height = 6,      
+  dpi = 500,
+  fig.retina = 2,
+  out.width = "100%",
+  dev = "png",        
+  dev.args = list(type = "cairo-png") 
+)
+```
+
+
+```{r setup, warning=FALSE, message=FALSE}
+library(MixLS)
+library(ggplot2)
+library(dplyr)
+```
+
+# Introduction
+
+The **MixLS** package provides tools for fitting mixed-effects location scale models to longitudinal and clustered data. These models extend traditional mixed-effects models by allowing covariates to influence both the mean structure and the variance components (both within-subject and between-subject variances).
+
+This approach is particularly useful for:
+
+- Intensive longitudinal data (e.g., ecological momentary assessment)
+- Understanding heteroscedasticity in repeated measures
+- Modeling both location (mean) and scale (variance) effects
+- Identifying subjects with different patterns of variability
+
+# Model Overview
+
+The mixed-effects location scale model can be written as:
+
+$$y_{ij} = \mathbf{x}_{ij}^T\boldsymbol{\beta} + \theta_{1i} + \epsilon_{ij}$$
+
+where:
+
+- **Mean model**: $\mathbf{x}_{ij}^T\boldsymbol{\beta}$ represents fixed effects
+- **Between-subject variance**: $\sigma^2_{\theta_1} = \exp(\mathbf{u}_{ij}^T\boldsymbol{\alpha})$
+- **Within-subject variance**: $\sigma^2_{\epsilon} = \exp(\mathbf{w}_{ij}^T\boldsymbol{\tau} + \tau_l\theta_{1i} + \sigma_\omega\theta_{2i})$
+
+The model is estimated in three sequential stages:
+
+1. **Stage 1**: Mean model + between-subject variance effects
+2. **Stage 2**: Adds within-subject variance effects  
+3. **Stage 3**: Adds random scale effects and location-scale association
+
+# Dataset: Riesby Depression Study
+
+We'll start with the Riesby depression dataset, which contains depression scores for 66 patients measured weekly over 6 weeks.
+
+```{r}
+# Load and examine the Riesby dataset
+data("riesby", package = "MixLS")
+head(riesby)
+summary(riesby)
+
+# Check the structure
+str(riesby)
+table(riesby$week)
+table(riesby$endog)
+```
+
+```{r, warning=FALSE, message=FALSE}
+# Visualize trajectories by group
+ggplot(riesby, aes(x = week, y = hamdep, group = id, color = factor(endog))) +
+  geom_line(alpha = 0.6) +
+  scale_color_manual(values = c("blue", "red"), 
+                     labels = c("Non-endogenous", "Endogenous")) +
+  labs(title = "Depression Scores Over Time",
+       subtitle = "Individual trajectories by depression type",
+       x = "Week", y = "Depression Score",
+       color = "Depression Type") +
+  theme_minimal()
+```
+
+## Fitting the Riesby Model
+
+We'll fit a model examining whether endogenous and non-endogenous depression groups differ in:
+
+- Mean depression levels and trends over time
+- Between-subject and within-subject variance
+
+```{r}
+# Fit the mixed-effects location scale model
+riesby_model <- mixregls(
+  data = riesby,
+  mean_formula = ~ week + endog + endweek,
+  var_bs_formula = ~ endog,
+  var_ws_formula = ~ week + endog,
+  id_var = "id",
+  response_var = "hamdep",
+  nq = 11,
+  maxiter = 200,
+  tol = 1e-5,
+  stage = 3,
+  stage3_model = "linear",
+  adaptive = 1,
+  ridge_stage1 = 0,
+  ridge_stage2 = 0.1,
+  ridge_stage3 = 0.2,
+  verbose = F
+)
+```
+
+```{r}
+# Get detailed summary
+summary(riesby_model)
+```
+
+## Visualizing Random Effects
+
+If adaptive quadrature was used, we can examine the empirical Bayes estimates:
+
+```{r}
+# Plot random effects if available
+if (!is.null(riesby_model$stage3$eb_estimates)) {
+  eb_data <- data.frame(
+    location = riesby_model$stage3$eb_estimates$theta2_eb[,1],
+    scale = riesby_model$stage3$eb_estimates$theta2_eb[,2]
+  )
+  ggplot(eb_data, aes(x = location, y = scale)) +
+    geom_point(alpha = 0.6) +
+    labs(title = "Random Location vs Scale Effects",
+         subtitle = "Each point represents one subject",
+         x = "Random Location Effect (θ1)", 
+         y = "Random Scale Effect (θ2)") +
+    theme_minimal()
+}
+```
+
+# Dataset: Positive Mood Study
+
+The positive mood dataset contains ecological momentary assessment (EMA) data from adolescents, with mood measurements taken multiple times per day.
+
+```{r}
+# Load and examine the positive mood dataset
+data(posmood, package = "MixLS")
+head(posmood)
+summary(posmood)
+
+# Check data structure
+str(posmood)
+table(posmood$alone)
+table(posmood$genderf)
+```
+
+```{r}
+# Visualize mood patterns
+# Sample a subset for clearer visualization
+set.seed(123)
+sample_ids <- sample(unique(posmood$id), 20)
+posmood_sample <- posmood[posmood$id %in% sample_ids, ]
+
+# Create observation numbers within each subject
+posmood_sample <- posmood_sample %>%
+  group_by(id) %>%
+  mutate(obs_number = row_number()) %>%
+  ungroup() 
+
+ggplot(posmood_sample, aes(x = obs_number, y = posmood, color = factor(id))) +
+  geom_line(alpha = 0.7, size = 0.8) +
+  facet_wrap(~ id, scales = "free_x", labeller = label_both) +
+  labs(title = "Positive Mood Trajectories (Sample of 20 Subjects)",
+       subtitle = "Each person's mood over their own observation sequence",
+       x = "Observation Number (within person)", 
+       y = "Positive Mood") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        strip.text = element_text(size = 10, face = "bold"))
+```
+
+```{r}
+# Examine mood by context and gender
+posmood %>%
+  mutate(alone_label = ifelse(alone == 1, "With Others", "Alone"),
+         gender_label = ifelse(genderf == 1, "Female", "Male")) %>%
+  ggplot(aes(x = alone_label, y = posmood, fill = gender_label)) +
+  geom_boxplot(alpha = 0.7) +
+  labs(title = "Positive Mood by Social Context and Gender",
+       x = "Social Context", y = "Positive Mood", fill = "Gender") +
+  theme_minimal()
+```
+
+## Fitting the Positive Mood Model
+
+We'll examine how being alone and gender affect both mean mood levels and mood variability.
+
+```{r}
+# Fit model with both social context and gender effects
+posmood_model <- mixregls(
+  data = posmood,
+  mean_formula = ~ alone + genderf,
+  var_bs_formula = ~ alone + genderf,
+  var_ws_formula = ~ alone + genderf,
+  id_var = "id",
+  response_var = "posmood",
+  nq = 11,
+  maxiter = 200,
+  tol = 1e-5,
+  stage = 3,
+  stage3_model = "linear",
+  ridge_stage1 = 0,
+  ridge_stage2 = 0.1,
+  ridge_stage3 = 0.2,
+  adaptive = 1
+)
+```
+
+```{r}
+# Detailed summary
+summary(posmood_model)
+```
+
+## Visualizing Random Effects
+
+If adaptive quadrature was used, we can examine the empirical Bayes estimates:
+
+```{r}
+# Plot random effects if available
+if (!is.null(posmood_model$stage3$eb_estimates)) {
+  eb_data <- data.frame(
+    location = posmood_model$stage3$eb_estimates$theta2_eb[,1],
+    scale = posmood_model$stage3$eb_estimates$theta2_eb[,2]
+  )
+  
+  ggplot(eb_data, aes(x = location, y = scale)) +
+    geom_point(alpha = 0.6) +
+    labs(title = "Random Location vs Scale Effects",
+         subtitle = "Each point represents one subject",
+         x = "Random Location Effect (θ1)", 
+         y = "Random Scale Effect (θ2)") +
+    theme_minimal()
+}
+```
+
+## Residual Analysis
+
+```{r}
+if (!is.null(posmood_model$stage3$standardized_residuals)) {
+  residuals_df <- data.frame(
+    residuals = posmood_model$stage3$standardized_residuals
+  )
+  
+  # Calculate values outside of ggplot
+  residuals_range <- max(residuals_df$residuals) - min(residuals_df$residuals)
+  n_bins <- 30
+  density_scale <- nrow(residuals_df) * residuals_range / n_bins
+  
+  # Histogram
+  p1 <- ggplot(residuals_df, aes(x = residuals)) +
+    geom_histogram(bins = 30, alpha = 0.7, fill = "skyblue", color = "black") +
+    geom_density(aes(y = after_stat(density) * density_scale), 
+                 color = "red", linewidth = 1) +
+    labs(title = "Distribution of Standardized Residuals",
+         x = "Standardized Residuals", y = "Frequency") +
+    theme_minimal()
+  
+  # Q-Q plot
+  p2 <- ggplot(residuals_df, aes(sample = residuals)) +
+    stat_qq() +
+    stat_qq_line(color = "red") +
+    labs(title = "Q-Q Plot of Standardized Residuals",
+         x = "Theoretical Quantiles", y = "Sample Quantiles") +
+    theme_minimal()
+  
+  print(p1)
+  print(p2)
+}
+```
+
+# Advanced Usage
+
+## Custom Model Fitting
+
+```{r}
+# Example of fitting with different options
+advanced_model <- mixregls(
+  data = posmood,
+  mean_formula = ~ alone * genderf,  # Include interaction
+  var_bs_formula = ~ alone * genderf, # Include interaction
+  var_ws_formula = ~ alone * genderf, # Include interaction
+  id_var = "id",
+  response_var = "posmood",
+  nq = 15,  # More quadrature points
+  maxiter = 300, # More iteration steps
+  tol = 1e-6,  # Stricter convergence
+  stage = 3,
+  stage3_model = "all", # Compare multiple models (independent, linear, quadratic & interaction)
+  ridge_stage1 = 0,
+  ridge_stage2 = 0.1,
+  ridge_stage3 = 0.5, # Larger starting ridge in stage 3 for quicker convergence
+  adaptive = 1
+)
+```
+
+```{r}
+# Detailed summary
+summary(advanced_model)
+```
+
+# Conclusion
+
+The MixLS package provides a flexible framework for modeling both location and scale effects in longitudinal data. Key features include:
+
+- **Three-stage estimation** for robust parameter estimation
+- **Flexible variance modeling** for both between- and within-subject effects
+- **Multiple association types** between location and scale effects
+- **Adaptive quadrature** for improved numerical integration
+- **Ridge regularization** for stable parameter estimation and handling convergence issues
+- **Comprehensive diagnostics** including empirical Bayes estimates
+
+This approach is particularly valuable for understanding individual differences in both mean levels and variability patterns, which is crucial for personalized interventions and understanding heterogeneity in longitudinal processes.
+
+## References
+
+Hedeker, D., Mermelstein, R. J., & Demirtas, H. (2008). An application of a mixed-effects location scale model for analysis of ecological momentary assessment (EMA) data. *Biometrics*, 64(2), 627-634.
+
+Hedeker, D., & Nordgren, R. (2013). MIXREGLS: A program for mixed-effects location scale analysis. *Journal of statistical software*, 52, 1-38.
+
+Rabe-Hesketh, S., Skrondal, A., & Pickles, A. (2002). Reliable estimation of generalized linear mixed models using adaptive quadrature. *The Stata Journal*, 2(1), 1-21.
+
+For more information and examples, see the package documentation and help files.

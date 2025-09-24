@@ -1,0 +1,28 @@
+Package: MixLS
+Type: Package
+Title: Mixed-Effects Location Scale Modeling
+Version: 1.0.0
+Author: Jianan Rui <jiananrui@uchicao.edu>
+Maintainer: Jianan Rui <jiananrui@uchicao.edu>
+Description: This package fits mixed-effects location scale models using a three-stage estimation procedure, allowing for both within-subject and between-subject variance heterogeneity.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Depends:
+    R (>= 3.5.0)
+Imports:
+    Rcpp,
+    statmod,
+    dplyr,
+    rlang,
+    stats
+LinkingTo:
+    Rcpp,
+    RcppArmadillo
+RoxygenNote: 7.3.3
+Suggests:
+    testthat,
+    knitr,
+    rmarkdown,
+    ggplot2
+VignetteBuilder: knitr

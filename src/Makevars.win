@@ -1,0 +1,11 @@
+## Makevars.win for MixLS package
+
+## Specify correct Rtools45 paths
+CXX = $(RTOOLS45_HOME)/x86_64-w64-mingw32.static.posix/bin/g++.exe
+CC = $(RTOOLS45_HOME)/x86_64-w64-mingw32.static.posix/bin/gcc.exe
+
+## Use the R's internal BLAS/LAPACK libraries
+PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(SHLIB_OPENMP_CXXFLAGS)
+
+## Additional compiler flags for RcppArmadillo
+PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS)
