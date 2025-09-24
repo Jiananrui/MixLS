@@ -45,7 +45,7 @@ This approach is particularly useful for:
 
 The mixed-effects location scale model can be written as:
 
-$$y_{ij} = \mathbf{x}_{ij}^T\boldsymbol{\beta} + \theta_{1i} + \epsilon_{ij}$$
+$$y_{ij} = \mathbf{x}_{ij}^T\boldsymbol{\beta} + \sigma_{vi}\theta_{1i} + \epsilon_{ij}$$
 
 where:
 
@@ -335,3 +335,4 @@ Hedeker, D., & Nordgren, R. (2013). MIXREGLS: A program for mixed-effects locati
 Rabe-Hesketh, S., Skrondal, A., & Pickles, A. (2002). Reliable estimation of generalized linear mixed models using adaptive quadrature. *The Stata Journal*, 2(1), 1-21.
 
 For more information and examples, see the package documentation and help files.
+
