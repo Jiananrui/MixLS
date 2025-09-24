@@ -43,7 +43,7 @@ if (!require("devtools")) {
 }
 
 # Install MixLS from GitHub
-devtools::install_github("Jiananrui/MixLS")
+devtools::install_github("Jiananrui/MixLS", build_vignettes = TRUE, dependencies = TRUE)
 ```
 
 ### Dependencies
@@ -245,7 +245,7 @@ The package includes comprehensive vignettes:
 
 ```r
 # Introduction and examples
-vignette("introduction", package = "MixLS")
+vignette("MIXLS-introduction", package = "MixLS")
 ```
 
 ## Troubleshooting
