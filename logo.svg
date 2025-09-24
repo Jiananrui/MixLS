@@ -1,0 +1,63 @@
+<svg width="1024" height="1180" viewBox="0 0 1024 1180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MixLS: Mixed-effects Location–Scale (σ²υ, σ²ε)">
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4F46E5"></stop>
+      <stop offset="100%" stop-color="#06B6D4"></stop>
+    </linearGradient>
+    <style>
+      .title { font: 700 120px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; letter-spacing:.5px; }
+      .subtitle { font: 500 42px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; opacity:.9; }
+      .math { font: 700 92px 'Times New Roman', Times, serif; fill:#fff; }
+      .band { stroke:#fff; stroke-width:14; stroke-dasharray:26 26; fill:none; opacity:.9; }
+      .mu { stroke:#fff; stroke-width:16; fill:none; opacity:.95; }
+      .dot { r:22; opacity:.95; }
+      .badge { fill:#ffffff22; }
+    </style>
+  </defs>
+
+  <!-- Hex background -->
+  <g transform="translate(512,590)">
+    <polygon points="0,-560 485,-280 485,280 0,560 -485,280 -485,-280" fill="url(#grad)"></polygon>
+  </g>
+
+  <!-- Variance bands (conceptual WS bands) -->
+  <path class="band" d="M 190 420 C 380 330, 640 330, 830 420"></path>
+  <path class="band" d="M 190 610 C 380 700, 640 700, 830 610"></path>
+
+  <!-- Central smooth mean curve (location) -->
+  <path class="mu" d="M 190 515 C 380 470, 640 470, 830 515"></path>
+
+  <!-- Unconnected point clusters -->
+  <circle class="dot" cx="270" cy="450" fill="#60A5FA"></circle>
+  <circle class="dot" cx="315" cy="470" fill="#60A5FA"></circle>
+  <circle class="dot" cx="345" cy="435" fill="#60A5FA"></circle>
+  <circle class="dot" cx="610" cy="470" fill="#F87171"></circle>
+  <circle class="dot" cx="655" cy="450" fill="#F87171"></circle>
+  <circle class="dot" cx="695" cy="480" fill="#F87171"></circle>
+  <circle class="dot" cx="415" cy="575" fill="#34D399"></circle>
+  <circle class="dot" cx="455" cy="600" fill="#34D399"></circle>
+  <circle class="dot" cx="500" cy="585" fill="#34D399"></circle>
+
+  <!-- Symbols INSIDE the hex with true subscripts, shifted upward -->
+  <!-- σ²υ (between-subject variance) -->
+  <g>
+    <ellipse class="badge" cx="250" cy="310" rx="120" ry="80"></ellipse>
+    <text x="190" y="330" class="math">
+      σ<tspan dy="-30" font-size="60">2</tspan>
+      <tspan baseline-shift="sub" font-size="60">υ</tspan>
+    </text>
+  </g>
+
+  <!-- σ²ε (within-subject variance) -->
+  <g>
+    <ellipse class="badge" cx="780" cy="315" rx="120" ry="80"></ellipse>
+    <text x="720" y="335" class="math">
+      σ<tspan dy="-30" font-size="60">2</tspan>
+      <tspan baseline-shift="sub" font-size="60">ε</tspan>
+    </text>
+  </g>
+
+  <!-- Title inside the hex -->
+  <text x="220" y="820" class="title" fill="#FFFFFF">MixLS</text>
+  <text x="220" y="875" class="subtitle" fill="#E5E7EB">Mixed-effects Location–Scale</text>
+</svg>
