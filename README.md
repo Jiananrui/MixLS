@@ -1,6 +1,9 @@
 # MixLS: Mixed-Effects Location Scale Models
 
-![MixLS logo](logo.svg)
+<p align="center">
+  <img src="logo.svg" alt="MixLS logo" width="200">
+</p>
+
 [![R](https://img.shields.io/badge/R-%3E%3D4.0.0-blue.svg)](https://www.r-project.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
