@@ -177,8 +177,8 @@ head(riesby)
 Variables:
 - `id`: Patient identifier
 - `week`: Week of assessment (0-5)
-- `hamdep`: Hamilton Depression Rating Scale score
-- `endog`: Endogenous depression indicator (0/1)
+- `hamdep`: Depression Score
+- `endog`: Endogenous depression indicator (1 = Endogenous, 0 = Non-Endogenous)
 - `endweek`: Interaction term (endog × week)
 
 ### 2. Positive Mood Study (`posmood`)
