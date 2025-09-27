@@ -36,7 +36,7 @@ mixregls <- function(data, mean_formula, var_bs_formula, var_ws_formula,
                      ridge_stage1 = 0,
                      ridge_stage2 = 0.1,
                      ridge_stage3 = 0.2,
-                     adaptive = 0,
+                     adaptive = 1,
                      verbose = FALSE) {
 
   if (!verbose) {
@@ -76,7 +76,7 @@ mixregls <- function(data, mean_formula, var_bs_formula, var_ws_formula,
 
   # Check if Stage 2 should be skipped
   # Stage 2 is skipped if var_ws_formula is ~ 1 (same as Stage 1's fixed formula)
-  skip_stage2 <- deparse(var_ws_formula) == deparse(~ 1)
+  skip_stage2 <- paste(deparse(var_ws_formula), collapse = "") == deparse("~ 1")
 
   if (skip_stage2 && stage == 2) {
     warning("Stage 2 requested but var_ws_formula is ~ 1 (same as Stage 1). Setting stage = 1.")
