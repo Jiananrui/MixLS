@@ -219,7 +219,7 @@ Variables:
 | `maxiter` | Maximum iterations | 200 |
 | `tol` | Convergence tolerance | 1e-5 |
 | `stage` | Modeling stage (1, 2, or 3) | 3 |
-| `adaptive` | Use adaptive quadrature (0/1) | 0 |
+| `adaptive` | Use adaptive quadrature (0/1) | 1 |
 | `ridge_stage1` | Ridge parameter for stage 1 | 0 |
 | `ridge_stage2` | Ridge parameter for stage 2 | 0.1 |
 | `ridge_stage3` | Ridge parameter for stage 3 | 0.2 |
