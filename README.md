@@ -87,22 +87,22 @@ library(MixLS)
 data("riesby", package = "MixLS")
 
 # Fit a mixed-effects location scale model
-model <- mixregls(
+model <- mels(
   data = riesby,
-  mean_formula = ~ week + endog + endweek,
-  var_bs_formula = ~ endog,
-  var_ws_formula = ~ week + endog,
-  id_var = "id",
-  response_var = "hamdep",
+  id = "id",
+  response = "hamdep",
+  fixed = ~ week + endog + endweek,
+  bs = ~ endog,
+  ws = ~ week + endog,
   nq = 11,
   maxiter = 200,
   tol = 1e-5,
   stage = 3,
-  stage3_model = "linear",
-  adaptive = 1,
-  ridge_stage1 = 0,
-  ridge_stage2 = 0.1,
-  ridge_stage3 = 0.2
+  type = "linear",
+  ridge1 = 0,
+  ridge2 = 0.1,
+  ridge3 = 0.2,
+  adaptive = 1
 )
 
 # View results
@@ -210,19 +210,20 @@ Variables:
 | Parameter | Description | Default |
 |-----------|-------------|---------|
 | `data` | Data frame containing variables | Required |
-| `mean_formula` | Formula for mean structure | Required |
-| `var_bs_formula` | Formula for between-subject variance | Required |
-| `var_ws_formula` | Formula for within-subject variance | Required |
-| `id_var` | Column name for subject ID | Required |
-| `response_var` | Column name for outcome variable | Required |
+| `id` | Column name for subject ID | Required |
+| `response` | Column name for outcome variable | Required |
+| `fixed` | Formula for mean (fixed effect) structure | Required |
+| `bs` | Formula for between-subject variance | Required |
+| `ws` | Formula for within-subject variance | Required |
 | `nq` | Number of quadrature points | 11 |
 | `maxiter` | Maximum iterations | 200 |
 | `tol` | Convergence tolerance | 1e-5 |
 | `stage` | Modeling stage (1, 2, or 3) | 3 |
+| `ridge1` | Ridge parameter for stage 1 | 0 |
+| `ridge2` | Ridge parameter for stage 2 | 0.1 |
+| `ridge3` | Ridge parameter for stage 3 | 0.2 |
 | `adaptive` | Use adaptive quadrature (0/1) | 1 |
-| `ridge_stage1` | Ridge parameter for stage 1 | 0 |
-| `ridge_stage2` | Ridge parameter for stage 2 | 0.1 |
-| `ridge_stage3` | Ridge parameter for stage 3 | 0.2 |
+| `verbose` | Show iteration information (TRUE/FALSE) | TRUE |
 
 ## Documentation
 
