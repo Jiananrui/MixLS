@@ -203,7 +203,7 @@ Variables:
 
 ### Main Modeling Function
 
-- `mixregls()`: Fit mixed-effects location scale models
+- `mels()`: Fit mixed-effects location scale models
 
 ### Model Parameters
 
