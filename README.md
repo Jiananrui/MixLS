@@ -234,7 +234,7 @@ Variables:
 help(package = "MixLS")
 
 # Function documentation
-?mixregls
+?mels
 
 # View vignettes
 browseVignettes("MixLS")
@@ -269,7 +269,7 @@ vignette("MIXLS-introduction", package = "MixLS")
    update.packages()
    
    # Install dependencies manually
-   install.packages(c("dplyr", "statmod", "Rcpp", "RcppArmadillo"))
+   install.packages(c("dplyr", "statmod", "Rcpp", "RcppArmadillo", "RcppParallel"))
    
    # For RcppArmadillo compilation issues on some systems:
    # Make sure you have appropriate C++ compiler
