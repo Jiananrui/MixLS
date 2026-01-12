@@ -1,0 +1,32 @@
+Package: MixLS
+Title: Mixed-Effects Location Scale Models
+Version: 1.1.0
+Authors@R: 
+    person("Jianan", "Rui", , "jiananrui@uchicago.edu", role = c("aut", "cre"))
+Description: Fits mixed-effects location scale models using a three-stage
+    estimation procedure, allowing for both within-subject and
+    between-subject variance heterogeneity. Methodologies are based on the
+    work of Hedeker and Nordgren (2013) <doi:10.18637/jss.v052.i12>.
+License: MIT + file LICENSE
+Imports: 
+    dplyr,
+    Rcpp,
+    RcppParallel,
+    rlang,
+    statmod,
+    stats
+Suggests:
+    ggplot2,
+    knitr,
+    rmarkdown
+LinkingTo: 
+    Rcpp,
+    RcppArmadillo,
+    RcppParallel
+VignetteBuilder: 
+    knitr
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+SystemRequirements: GNU make
